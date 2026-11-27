@@ -1,0 +1,174 @@
+/* Girasole – Animazioni. Tutto vale solo dopo che il JS ha aggiunto le sue classi:
+   senza JS (o con "riduci movimento") la pagina resta com'è in Elementor. */
+
+/* In attesa di GSAP (massimo 3 secondi, poi tutto torna visibile da solo) */
+html.gs-attesa #content [data-elementor-type="wp-page"] .elementor-widget:not(.no-anim):not(.no-anim *):not(.elementor-widget-video):not(.elementor-widget-google_maps):not(.elementor-widget-html):not(.elementor-widget-shortcode),
+html.gs-attesa #content [data-elementor-type="wp-page"] .e-con.e-child[data-settings*='"background_background":"classic"']:not(.no-anim):not(.no-anim *) {
+	opacity: 0;
+}
+
+/* ---------- strato foto: finestre e parallasse ---------- */
+.gs-con-strato {
+	isolation: isolate; /* lo strato a z-index negativo resta dentro la fascia */
+}
+.gs-con-strato--sfondo {
+	background-image: none !important; /* la foto ora la disegna lo strato */
+}
+.gs-nascosta {
+	visibility: hidden !important; /* l'immagine del widget tiene il suo spazio, la foto la disegna lo strato */
+}
+.gs-strato {
+	position: absolute;
+	inset: 0;
+	z-index: -2; /* sotto i divisori a onda e il contenuto */
+	pointer-events: none;
+	overflow: hidden;
+	clip-path: inset(0 round var(--border-radius, 0)); /* ritaglia anche la foto "fixed" */
+	border-radius: var(--border-radius, 0);
+}
+.gs-strato__foto {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	background-repeat: no-repeat;
+	background-size: cover;
+	will-change: transform;
+}
+.gs-modo-fisso > .gs-strato > .gs-strato__foto {
+	position: fixed;
+	height: 100vh;
+	height: 100lvh; /* su iPhone non cambia misura quando sparisce la barra degli indirizzi */
+	will-change: auto;
+}
+
+/* ---------- titoli spezzati in righe (SplitText) ---------- */
+.gs-riga-mask {
+	/* un po' di respiro, così la maschera non taglia accenti e lettere che scendono */
+	padding-block: 0.12em;
+	margin-block: -0.12em;
+}
+
+/* ---------- pulsanti al passaggio del mouse ---------- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+	/* BREZZA: un velo di luce attraversa il pulsante, che si alza appena */
+	.gs-stile-brezza #content .elementor-button {
+		position: relative;
+		overflow: hidden;
+		isolation: isolate;
+		transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.6s cubic-bezier(0.22, 1, 0.36, 1), background-color 0.3s, color 0.3s;
+	}
+	.gs-stile-brezza #content .elementor-button::after {
+		content: "";
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(105deg, transparent 25%, rgba(255, 255, 255, 0.32) 50%, transparent 75%);
+		transform: translateX(-110%);
+		transition: transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+		pointer-events: none;
+	}
+	.gs-stile-brezza #content .elementor-button:hover {
+		transform: translateY(-2px);
+		box-shadow: 0 10px 22px -12px rgba(71, 31, 0, 0.5);
+	}
+	.gs-stile-brezza #content .elementor-button:hover::after {
+		transform: translateX(110%);
+	}
+}
+
+/* ---------- RACCOLTO ---------- */
+.gs-si-accende {
+	isolation: isolate;
+}
+.gs-riempimento {
+	position: absolute;
+	inset: 0;
+	z-index: -1; /* il colore sale dietro ai testi del riquadro */
+	pointer-events: none;
+}
+
+/* ---------- DISEGNATO A MANO ---------- */
+/* sottolineatura a matita sotto i titoli, nel giallo del Kit */
+.gs-matita {
+	position: absolute;
+	height: 14px;
+	overflow: visible;
+	pointer-events: none;
+	fill: none;
+	stroke: var(--e-global-color-3646591, #F8A611);
+	stroke-width: 3;
+	stroke-linecap: round;
+}
+.gs-matita path + path {
+	stroke-width: 2;
+	opacity: 0.7;
+}
+
+/* il girasole a linea dentro i contenitori con classe "girasole-disegno" (oggi: sezione testo di Azienda agricola) */
+.gs-stile-disegnato .girasole-disegno {
+	position: relative;
+}
+.gs-girasole {
+	position: absolute;
+	pointer-events: none;
+	z-index: 0;
+	/* telefono: piccolo nell'angolo in alto a destra, dentro il margine sopra il titolo */
+	top: 4px;
+	right: 10px;
+	height: 66px;
+}
+.gs-girasole svg {
+	display: block;
+	height: 100%;
+	width: auto;
+}
+.gs-girasole .gs-petali { stroke: var(--e-global-color-3646591, #F8A611); }
+.gs-girasole .gs-centro { stroke: var(--e-global-color-secondary, #471F00); }
+.gs-girasole .gs-stelo,
+.gs-girasole .gs-foglia { stroke: var(--e-global-color-primary, #467303); }
+@media (min-width: 768px) {
+	/* tablet: accanto al titolo, a destra della colonna di testo */
+	.gs-girasole { top: 12px; right: auto; left: calc(50% + 230px); height: 90px; }
+}
+@media (min-width: 1200px) {
+	/* computer: grande, nel margine a destra del testo (largo 760px) */
+	.gs-girasole { top: 40px; left: calc(50% + 410px); height: 230px; }
+}
+
+/* ---------- pulsanti al passaggio del mouse (RACCOLTO e DISEGNATO) ---------- */
+@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+	/* RACCOLTO: il pulsante si gonfia con un piccolo rimbalzo e la freccia fa un passo avanti */
+	.gs-stile-raccolto #content .elementor-button {
+		transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.3s, color 0.3s;
+	}
+	.gs-stile-raccolto #content .elementor-button:hover {
+		transform: scale(1.06);
+	}
+	.gs-stile-raccolto #content .elementor-button .elementor-button-icon {
+		transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+	}
+	.gs-stile-raccolto #content .elementor-button:hover .elementor-button-icon {
+		transform: translateX(4px);
+	}
+
+	/* DISEGNATO: sotto la scritta si traccia un segno a matita giallo */
+	.gs-stile-disegnato #content .elementor-button {
+		position: relative;
+	}
+	.gs-stile-disegnato #content .elementor-button::after {
+		content: "";
+		position: absolute;
+		left: 16%;
+		right: 16%;
+		bottom: 5px;
+		height: 7px;
+		background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 10' preserveAspectRatio='none'%3E%3Cpath d='M3,6 C40,3 72,8.4 106,5.2 C140,2.6 170,7 197,4.6' fill='none' stroke='%23F8A611' stroke-width='2.6' stroke-linecap='round' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E") center / 100% 100% no-repeat;
+		clip-path: inset(0 100% 0 0);
+		transition: clip-path 0.5s cubic-bezier(0.65, 0, 0.35, 1);
+		pointer-events: none;
+	}
+	.gs-stile-disegnato #content .elementor-button:hover::after {
+		clip-path: inset(0 0 0 0);
+	}
+}
